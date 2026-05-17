@@ -1,0 +1,90 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 64px;
+    background-color: #0f0f0f;
+    border-bottom: 1px solid #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #ededed;
+}
+
+.brand-icon {
+    font-size: 1.2rem;
+    color: #3ecf8e;
+}
+
+.brand-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 0.50rem;
+}
+
+.navbar-links a {
+    color: #a0a0a0;
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.navbar-links a:hover {
+    color: #ededed;
+    background: #1f1f1f;
+}
+
+.navbar-links a.active {
+    color: #ededed;
+    background: #1f1f1f;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-email {
+    font-size: 0.825rem;
+    color: #666;
+}
+
+.btn-signout {
+    font-size: 0.825rem;
+    color: #a0a0a0;
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-signout:hover {
+    color: #ededed;
+    border-color: #444;
+    background: #1a1a1a;
+}

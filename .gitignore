@@ -1,0 +1,63 @@
+# Build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+.idea/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local History for Visual Studio
+.localhistory/
+
+# NuGet files
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+
+# Static web assets
+staticwebassets/
+wwwroot/.bundle/
+
+# Runtime files
+*.runtimeconfig.json
+*.runtimeconfig.dev.json
+
+# Compiled files
+*.o
+*.a
+*.so
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+
+# IDE generated files
+.vscode
+.idea
+*.code-workspace
+
+# Other
+node_modules/
+dist/
+.parcel-cache/
+
+sample-data/

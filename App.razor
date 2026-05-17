@@ -1,0 +1,40 @@
+﻿@inject NavigationManager Nav
+@implements IDisposable
+
+<Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+    <Found Context="routeData">
+        @if (_navigating)
+        {
+            <div class="page-loader">
+                <div class="loader-bar-fill"></div>
+            </div>
+        }
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+</Router>
+
+@code {
+    bool _navigating = false;
+
+    protected override void OnInitialized()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _navigating = true;
+        StateHasChanged();
+        Task.Delay(300).ContinueWith(_ =>
+        {
+            _navigating = false;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+}
