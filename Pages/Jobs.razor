@@ -1,4 +1,36 @@
 @page "/jobs"
 @layout MainLayout
 
-<h3>Jobs</h3>
+<div class="page-wrapper">
+    <div class="stack">
+        <!-- Header -->
+        <div class="row" style="justify-content: space-between; align-items: center;">
+            <h1>Jobs</h1>
+            <button class="btn btn--primary">+ Add Job</button>
+        </div>
+
+        <!-- Jobs Table -->
+        <div class="table-wrap">
+            <table class="table table--striped">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Role</th>
+                        <th>Location</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                        <th>Interview</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: var(--space-5);">
+                            No jobs added yet
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

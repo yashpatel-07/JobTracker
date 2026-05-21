@@ -1,0 +1,153 @@
+@page "/login"
+@layout MainLayout
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="page-wrapper">
+    <div class="page-content center">
+        <div class="w-md-fixed container">
+            <div class="stack">
+                <h2>Sign In</h2>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="field__error">
+                        @errorMessage
+                    </div>
+                }
+
+                <div class="field">
+                    <label class="field__label" for="email">Email</label>
+                    <input class="input" id="email" type="email" placeholder="you@example.com" @bind="email" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="password">Password</label>
+                    <input class="input" id="password" type="password" placeholder="••••••••" @bind="password" />
+                </div>
+
+                <button class="btn btn--primary btn--md btn--full" @onclick="SignIn" disabled="@isLoadingSignIn">
+                    @if (isLoadingSignIn)
+                    {
+                        <span>Signing in...</span>
+                    }
+                    else
+                    {
+                        <span>Sign In</span>
+                    }
+                </button>
+
+                <div class="row">
+                    <div class="divider--horizontal"></div>
+                    <span class="text-secondary text-sm">OR</span>
+                    <div class="divider--horizontal"></div>
+                </div>
+
+                <button class="btn btn--secondary btn--md btn--full" @onclick="SignUp" disabled="@isLoadingSignUp">
+                    @if (isLoadingSignUp)
+                    {
+                        <span>Signing up...</span>
+                    }
+                    else
+                    {
+                        <span>Sign Up</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string errorMessage = "";
+    private bool isLoadingSignIn = false;
+    private bool isLoadingSignUp = false;
+
+    private string ValidateCredentials(string email, string password, bool isSignUp = false)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return "Email is required.";
+
+        if (string.IsNullOrWhiteSpace(password))
+            return "Password is required.";
+
+        if (!email.Contains("@"))
+            return "Please enter a valid email.";
+
+        if (isSignUp && password.Length < 6)
+            return "Password must be at least 6 characters.";
+
+        return string.Empty;
+    }
+
+    private async Task SignIn()
+    {
+        var validationError = ValidateCredentials(email, password);
+        if (!string.IsNullOrEmpty(validationError))
+        {
+            errorMessage = validationError;
+            return;
+        }
+
+        isLoadingSignIn = true;
+        errorMessage = "";
+
+        try
+        {
+            var success = await AuthService.SignInAsync(email, password);
+            if (success)
+            {
+                Navigation.NavigateTo("/jobs");
+            }
+            else
+            {
+                errorMessage = "Sign in failed. Check your credentials.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoadingSignIn = false;
+        }
+    }
+
+    private async Task SignUp()
+    {
+        var validationError = ValidateCredentials(email, password, isSignUp: true);
+        if (!string.IsNullOrEmpty(validationError))
+        {
+            errorMessage = validationError;
+            return;
+        }
+
+        isLoadingSignUp = true;
+        errorMessage = "";
+
+        try
+        {
+            var success = await AuthService.SignUpAsync(email, password);
+            if (success)
+            {
+                Navigation.NavigateTo("/jobs");
+            }
+            else
+            {
+
+                errorMessage = "Sign up failed. Email might already exist.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoadingSignUp = false;
+        }
+    }
+}

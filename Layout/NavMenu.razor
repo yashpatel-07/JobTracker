@@ -1,16 +1,67 @@
 ﻿<header class="navbar">
     <div class="navbar-left">
-        <a href="/" class="navbar-brand">
+        <a href="@(AuthService.IsAuthenticated ? "/jobs" : "/")" class="navbar-brand">
             <span class="brand-icon">⟡</span>
             <span class="brand-name">JobTracker</span>
         </a>
         <nav class="navbar-links">
-            <NavLink href="" Match="NavLinkMatch.All">Dashboard</NavLink>
-            <NavLink href="jobs">My Jobs</NavLink>
+            @if (!AuthService.IsAuthenticated)
+            {
+                <NavLink href="" Match="NavLinkMatch.All">Dashboard</NavLink>
+            }
+            @if (AuthService.IsAuthenticated)
+            {
+                <NavLink href="jobs">Jobs</NavLink>
+            }
         </nav>
     </div>
     <div class="navbar-right">
-        <span class="user-email">user@email.com</span>
-        <button class="btn-signout">Sign out</button>
+        @if (AuthService.IsAuthenticated)
+        {
+            <span class="user-email">@AuthService.GetCurrentUser()?.Email</span>
+            <button class="btn btn--secondary btn--xs btn-signout" @onclick="SignOut">Sign out</button>
+        }
+        else if (!isLoginPage)
+        {
+            <NavLink href="login" class="btn btn--primary btn--xs">Sign in</NavLink>
+        }
     </div>
 </header>
+
+@code {
+    @inject AuthService AuthService
+    @inject NavigationManager Navigation
+
+    private bool isLoginPage = false;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        isLoginPage = IsLoginPage();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        isLoginPage = IsLoginPage();
+        StateHasChanged();
+    }
+
+    private async Task SignOut()
+    {
+        await AuthService.SignOutAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private bool IsLoginPage()
+    {
+        var uri = Navigation.Uri;
+        var path = uri.Split('?', '#')[0];
+        return path.EndsWith("/login", StringComparison.OrdinalIgnoreCase) || path == Navigation.BaseUri + "login";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        await ValueTask.CompletedTask;
+    }
+}

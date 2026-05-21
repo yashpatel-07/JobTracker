@@ -1,4 +1,55 @@
 @page "/"
 @layout MainLayout
 
-<h3>Dashboard</h3>
+<div class="page-wrapper">
+    <div class="col stack dashboard-hero">
+        <div class="col text-center center">
+            <h1 class="text-2xl hero-title">
+                <span class="hero-gradient">Track Your Jobs</span>
+                <br />
+                <span class="text-secondary">Organize Your Career</span>
+            </h1>
+
+            <p class="text-lg text-secondary hero-desc">
+                Keep all your job applications in one place. Monitor status, track deadlines, and never miss an
+                opportunity again.
+            </p>
+
+            @if (!AuthService.IsAuthenticated)
+            {
+                <a href="login" class="btn btn--width--quarter btn--primary hero-cta">Get Started</a>
+            }
+        </div>
+
+        <div class="col features-container">
+            <h2 class="text-xl font-bold text-center">Features</h2>
+
+            <div class="row features-grid">
+                <div class="col feature-card text-center">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="text-md font-bold">Centralized Hub</h3>
+                    <p class="text-sm text-muted">Store all job applications in one organized place. Easy to access
+                        anytime, anywhere.</p>
+                    </div>
+
+                    <div class="col feature-card text-center">
+                        <div class="feature-icon">✅</div>
+                        <h3 class="text-md font-bold">Status Tracking</h3>
+                        <p class="text-sm text-muted">Track application status from submission to interview. Never lose
+                            sight of where you stand.</p>
+                        </div>
+
+                        <div class="col feature-card text-center">
+                            <div class="feature-icon">⏰</div>
+                            <h3 class="text-md font-bold">Deadline Management</h3>
+                            <p class="text-sm text-muted">Keep track of important dates and deadlines. Stay organized and never
+                                miss a deadline.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+@code {
+    @inject AuthService AuthService
+}
