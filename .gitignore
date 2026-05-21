@@ -50,6 +50,9 @@ Thumbs.db
 .env
 .env.local
 
+# Application settings (use appsettings.example.json instead)
+wwwroot/appsettings.json
+
 # IDE generated files
 .vscode
 .idea
