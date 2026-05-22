@@ -1,15 +1,18 @@
 using Supabase;
 using Supabase.Gotrue;
+using Microsoft.JSInterop;
 
 namespace JobTracker.Services;
 
 public class AuthService
 {
     private readonly Supabase.Client _supabaseClient;
+    private readonly IJSRuntime _jsRuntime;
 
-    public AuthService(Supabase.Client supabaseClient)
+    public AuthService(Supabase.Client supabaseClient, IJSRuntime jsRuntime)
     {
         _supabaseClient = supabaseClient;
+        _jsRuntime = jsRuntime;
     }
 
     public async Task<bool> SignUpAsync(string email, string password)
@@ -17,7 +20,11 @@ public class AuthService
         try
         {
             var session = await _supabaseClient.Auth.SignUp(email, password);
-            return session?.User != null;
+            if (session?.User != null)
+            {
+                return true;
+            }
+            return false;
         }
         catch
         {
@@ -30,7 +37,11 @@ public class AuthService
         try
         {
             var session = await _supabaseClient.Auth.SignInWithPassword(email, password);
-            return session?.User != null;
+            if (session?.User != null)
+            {
+                return true;
+            }
+            return false;
         }
         catch
         {
@@ -41,6 +52,8 @@ public class AuthService
     public async Task SignOutAsync()
     {
         await _supabaseClient.Auth.SignOut();
+        // Clear session from localStorage
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sb-sbpersist");
     }
 
     public Session? GetCurrentSession()
@@ -54,4 +67,6 @@ public class AuthService
     }
 
     public bool IsAuthenticated => _supabaseClient.Auth.CurrentUser != null;
+
+
 }

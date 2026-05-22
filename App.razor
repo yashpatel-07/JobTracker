@@ -17,9 +17,10 @@
 @code {
     bool _navigating = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Nav.LocationChanged += OnLocationChanged;
+        await Task.CompletedTask;
     }
 
     void OnLocationChanged(object? sender, LocationChangedEventArgs e)

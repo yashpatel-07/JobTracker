@@ -1,15 +1,16 @@
 @page "/jobs"
 @layout MainLayout
 
+@inject AuthService AuthService
+@inject JobService JobService
+
 <div class="page-wrapper">
     <div class="stack">
-        <!-- Header -->
         <div class="row" style="justify-content: space-between; align-items: center;">
             <h1>Jobs</h1>
-            <button class="btn btn--primary">+ Add Job</button>
+            <button class="btn btn--primary" @onclick="AddJob">+ Add Job</button>
         </div>
 
-        <!-- Jobs Table -->
         <div class="table-wrap">
             <table class="table table--striped">
                 <thead>
@@ -20,17 +21,136 @@
                         <th>Applied Date</th>
                         <th>Status</th>
                         <th>Interview</th>
+                        <th>Interview Type</th>
+                        <th>Link</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: var(--space-5);">
-                            No jobs added yet
-                        </td>
-                    </tr>
+                    @if (jobs != null)
+                    {
+                        @foreach (var job in jobs)
+                        {
+                            <tr>
+                                <td>@job.Company</td>
+                                <td>@job.Role</td>
+                                <td>@job.Location</td>
+                                <td>@job.AppliedDate.ToShortDateString()</td>
+                                <td>@job.Status</td>
+                                <td>@(job.InterviewDate.HasValue ? job.InterviewDate.Value.ToShortDateString() : "N/A")</td>
+                                <td>N/A</td>
+                                <td><a href="@job.WebsiteLink" target="_blank">View</a></td>
+                                <td>
+                                    <div class="row">
+                                        <button class="btn btn--sm btn--primary">Edit</button>
+                                        <button class="btn btn--sm btn--danger">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    @if (isAddingJob == false && (jobs == null || jobs.Count == 0))
+                    {
+                        <tr>
+                            <td colspan="9" style="text-align: center; color: var(--text-muted); padding: var(--space-5);">
+                                No jobs added yet
+                            </td>
+                        </tr>
+                    }
+                    @if (isAddingJob)
+                    {
+                        <tr>
+                            <td><input class="input" type="text" placeholder="Company" /></td>
+                            <td><input class="input" type="text" placeholder="Role" /></td>
+                            <td><input class="input" type="text" placeholder="Location" /></td>
+                            <td><input class="input" type="date" /></td>
+                            <td>
+                                <select class="input">
+                                    <option value="applied">Applied</option>
+                                    <option value="interviewing">Interviewing</option>
+                                    <option value="offer">Offered</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="accepted"></option>
+                                </select>
+                            </td>
+                            <td><input class="input" type="date" /></td>
+                            <td>
+                                <select class="input">
+                                    <option value="Phone">Phone</option>
+                                    <option value="On-site">On-site</option>
+                                    <option value="Video">Video</option>
+                                </select>
+                            </td>
+                            <td><input class="input" type="url" placeholder="https://..." /></td>
+                            <td class="row">
+                                <button class="btn btn--success btn--sm" @onclick="CreateJobAsync">Save</button>
+                                <button class="btn btn--danger btn--sm" @onclick="CancelAddJob">Cancel</button>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@code {
+    private bool isAddingJob = false;
+    private List<Job>? jobs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthService.GetCurrentUser();
+        if (user?.Id != null)
+        {
+            await LoadJobsAsync(Guid.Parse(user.Id));
+        }
+    }
+    private void AddJob()
+    {
+        isAddingJob = true;
+    }
+    private void CancelAddJob()
+    {
+        isAddingJob = false;
+    }
+    private async Task LoadJobsAsync(Guid userId)
+    {
+        try
+        {
+            jobs = await JobService.GetJobsByUserAsync(userId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading jobs: {ex.Message}");
+        }
+    }
+    private async Task CreateJobAsync()
+    {
+        try
+        {
+            var user = AuthService.GetCurrentUser();
+            Console.WriteLine($"Current user: {user?.Id}");
+            if (user?.Id != null)
+            {
+                var newJob = new Job
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.Parse(user.Id),
+                    Company = "New Company",
+                    Role = "New Role",
+                    Location = "New Location",
+                    AppliedDate = DateTime.UtcNow,
+                    Status = "applied",
+                    InterviewDate = null
+                };
+                await JobService.CreateJobAsync(newJob);
+                await LoadJobsAsync(Guid.Parse(user.Id));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating job: {ex.Message}");
+        }
+    }
+}
