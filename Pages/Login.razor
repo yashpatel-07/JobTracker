@@ -3,16 +3,18 @@
 @inject AuthService AuthService
 @inject NavigationManager Navigation
 
-<div class="page-wrapper">
-    <div class="page-content center">
-        <div class="w-md-fixed container">
-            <div class="stack">
-                <h2>Sign In</h2>
+@if (sessionReady && !AuthService.IsAuthenticated)
+{
+    <div class="page-wrapper">
+        <div class="page-content center">
+            <div class="w-md-fixed container">
+                <div class="stack">
+                    <h2>Sign In</h2>
 
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div class="field__error">
-                        @errorMessage
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="field__error">
+                            @errorMessage
                     </div>
                 }
 
@@ -56,14 +58,35 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
+}
 
 @code {
+    @inject AuthService AuthService
+    @inject NavigationManager Navigation
+
     private string email = "";
     private string password = "";
     private string errorMessage = "";
     private bool isLoadingSignIn = false;
     private bool isLoadingSignUp = false;
+    private bool sessionReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Wait for session to be fully initialized
+        await AuthService.WaitForSessionAsync();
+        
+        // If user is already authenticated, redirect to jobs
+        if (AuthService.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/jobs");
+        }
+        else
+        {
+            sessionReady = true;
+        }
+    }
 
     private string ValidateCredentials(string email, string password, bool isSignUp = false)
     {

@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager Nav
+@inject AuthService AuthService
 @implements IDisposable
 
 <Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
@@ -20,6 +21,8 @@
     protected override async Task OnInitializedAsync()
     {
         Nav.LocationChanged += OnLocationChanged;
+        // Initialize/restore session from localStorage
+        await AuthService.InitializeSessionAsync();
         await Task.CompletedTask;
     }
 

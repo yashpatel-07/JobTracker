@@ -5,25 +5,31 @@
             <span class="brand-name">JobTracker</span>
         </a>
         <nav class="navbar-links">
-            @if (!AuthService.IsAuthenticated)
+            @if (sessionReady)
             {
-                <NavLink href="" Match="NavLinkMatch.All">Dashboard</NavLink>
-            }
-            @if (AuthService.IsAuthenticated)
-            {
-                <NavLink href="jobs">Jobs</NavLink>
+                @if (!AuthService.IsAuthenticated)
+                {
+                    <NavLink href="" Match="NavLinkMatch.All">Dashboard</NavLink>
+                }
+                @if (AuthService.IsAuthenticated)
+                {
+                    <NavLink href="jobs">Jobs</NavLink>
+                }
             }
         </nav>
     </div>
     <div class="navbar-right">
-        @if (AuthService.IsAuthenticated)
+        @if (sessionReady)
         {
-            <span class="user-email">@AuthService.GetCurrentUser()?.Email</span>
-            <button class="btn btn--secondary btn--xs btn-signout" @onclick="SignOut">Sign out</button>
-        }
-        else if (!isLoginPage)
-        {
-            <NavLink href="login" class="btn btn--primary btn--xs">Sign in</NavLink>
+            @if (AuthService.IsAuthenticated)
+            {
+                <span class="user-email">@AuthService.GetCurrentUser()?.Email</span>
+                <button class="btn btn--secondary btn--xs btn-signout" @onclick="SignOut">Sign out</button>
+            }
+            else if (!isLoginPage)
+            {
+                <NavLink href="login" class="btn btn--primary btn--xs">Sign in</NavLink>
+            }
         }
     </div>
 </header>
@@ -33,9 +39,14 @@
     @inject NavigationManager Navigation
 
     private bool isLoginPage = false;
+    private bool sessionReady = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        // Wait for session to be fully initialized
+        await AuthService.WaitForSessionAsync();
+        sessionReady = true;
+
         Navigation.LocationChanged += OnLocationChanged;
         isLoginPage = IsLoginPage();
     }

@@ -31,22 +31,58 @@
                     {
                         @foreach (var job in jobs)
                         {
-                            <tr>
-                                <td>@job.Company</td>
-                                <td>@job.Role</td>
-                                <td>@job.Location</td>
-                                <td>@job.AppliedDate.ToShortDateString()</td>
-                                <td>@job.Status</td>
-                                <td>@(job.InterviewDate.HasValue ? job.InterviewDate.Value.ToShortDateString() : "N/A")</td>
-                                <td>N/A</td>
-                                <td><a href="@job.WebsiteLink" target="_blank">View</a></td>
-                                <td>
-                                    <div class="row">
-                                        <button class="btn btn--sm btn--primary">Edit</button>
-                                        <button class="btn btn--sm btn--danger">Delete</button>
-                                    </div>
-                                </td>
-                            </tr>
+                            @if (editingJobId == job.Id)
+                            {
+                                <tr>
+                                    <td><input class="input" type="text" placeholder="Company" @bind="editJobCompany" /></td>
+                                    <td><input class="input" type="text" placeholder="Role" @bind="editJobRole" /></td>
+                                    <td><input class="input" type="text" placeholder="Location" @bind="editJobLocation" /></td>
+                                    <td><input class="input" type="date" @bind="editJobAppliedDate" /></td>
+                                    <td>
+                                        <select class="input" @bind="editJobStatus">
+                                            <option value="applied">Applied</option>
+                                            <option value="interviewing">Interviewing</option>
+                                            <option value="offer">Offered</option>
+                                            <option value="rejected">Rejected</option>
+                                            <option value="accepted">Accepted</option>
+                                        </select>
+                                    </td>
+                                    <td><input class="input" type="date" @bind="editJobInterviewDate" /></td>
+                                    <td>
+                                        <select class="input" @bind="editJobInterviewType">
+                                            <option value="">None</option>
+                                            <option value="Phone">Phone</option>
+                                            <option value="On-site">On-site</option>
+                                            <option value="Video">Video</option>
+                                        </select>
+                                    </td>
+                                    <td><input class="input" type="url" placeholder="https://..." @bind="editJobWebsiteLink" /></td>
+                                    <td class="row">
+                                        <button class="btn btn--success btn--sm" @onclick="UpdateJobAsync">Save</button>
+                                        <button class="btn btn--danger btn--sm" @onclick="CancelEditJob">Cancel</button>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>@job.Company</td>
+                                    <td>@job.Role</td>
+                                    <td>@job.Location</td>
+                                    <td>@job.AppliedDate.ToShortDateString()</td>
+                                    <td>@job.Status</td>
+                                    <td>@(job.InterviewDate.HasValue ? job.InterviewDate.Value.ToShortDateString() : "N/A")</td>
+                                    <td>N/A</td>
+                                    <td><a href="@job.WebsiteLink" target="_blank">View</a></td>
+                                    <td>
+                                        <div class="row">
+                                            <button class="btn btn--sm btn--primary" @onclick="() => EditJob(job)">Edit</button>
+                                            <button class="btn btn--sm btn--danger"
+                                                    @onclick="() => DeleteJobAsync(job.Id)">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
                     }
                     @if (isAddingJob == false && (jobs == null || jobs.Count == 0))
@@ -60,28 +96,29 @@
                     @if (isAddingJob)
                     {
                         <tr>
-                            <td><input class="input" type="text" placeholder="Company" /></td>
-                            <td><input class="input" type="text" placeholder="Role" /></td>
-                            <td><input class="input" type="text" placeholder="Location" /></td>
-                            <td><input class="input" type="date" /></td>
+                            <td><input class="input" type="text" placeholder="Company" @bind="newJobCompany" /></td>
+                            <td><input class="input" type="text" placeholder="Role" @bind="newJobRole" /></td>
+                            <td><input class="input" type="text" placeholder="Location" @bind="newJobLocation" /></td>
+                            <td><input class="input" type="date" @bind="newJobAppliedDate" /></td>
                             <td>
-                                <select class="input">
+                                <select class="input" @bind="newJobStatus">
                                     <option value="applied">Applied</option>
                                     <option value="interviewing">Interviewing</option>
                                     <option value="offer">Offered</option>
                                     <option value="rejected">Rejected</option>
-                                    <option value="accepted"></option>
+                                    <option value="accepted">Accepted</option>
                                 </select>
                             </td>
-                            <td><input class="input" type="date" /></td>
+                            <td><input class="input" type="date" @bind="newJobInterviewDate" /></td>
                             <td>
-                                <select class="input">
+                                <select class="input" @bind="newJobInterviewType">
+                                    <option value="">None</option>
                                     <option value="Phone">Phone</option>
                                     <option value="On-site">On-site</option>
                                     <option value="Video">Video</option>
                                 </select>
                             </td>
-                            <td><input class="input" type="url" placeholder="https://..." /></td>
+                            <td><input class="input" type="url" placeholder="https://..." @bind="newJobWebsiteLink" /></td>
                             <td class="row">
                                 <button class="btn btn--success btn--sm" @onclick="CreateJobAsync">Save</button>
                                 <button class="btn btn--danger btn--sm" @onclick="CancelAddJob">Cancel</button>
@@ -96,10 +133,34 @@
 
 @code {
     private bool isAddingJob = false;
+    private Guid? editingJobId = null;
     private List<Job>? jobs;
+
+    // Add Job form properties
+    private string newJobCompany = string.Empty;
+    private string newJobRole = string.Empty;
+    private string newJobLocation = string.Empty;
+    private DateTime newJobAppliedDate = DateTime.Today;
+    private string newJobStatus = "applied";
+    private DateTime? newJobInterviewDate;
+    private string? newJobInterviewType;
+    private string? newJobWebsiteLink;
+
+    // Edit Job form properties
+    private string editJobCompany = string.Empty;
+    private string editJobRole = string.Empty;
+    private string editJobLocation = string.Empty;
+    private DateTime editJobAppliedDate = DateTime.Today;
+    private string editJobStatus = "applied";
+    private DateTime? editJobInterviewDate;
+    private string? editJobInterviewType;
+    private string? editJobWebsiteLink;
 
     protected override async Task OnInitializedAsync()
     {
+        // Wait for session to be fully initialized
+        await AuthService.WaitForSessionAsync();
+
         var user = AuthService.GetCurrentUser();
         if (user?.Id != null)
         {
@@ -109,10 +170,56 @@
     private void AddJob()
     {
         isAddingJob = true;
+        editingJobId = null;
     }
     private void CancelAddJob()
     {
         isAddingJob = false;
+        ResetJobForm();
+    }
+
+    private void EditJob(Job job)
+    {
+        editingJobId = job.Id;
+        editJobCompany = job.Company;
+        editJobRole = job.Role;
+        editJobLocation = job.Location ?? string.Empty;
+        editJobAppliedDate = job.AppliedDate;
+        editJobStatus = job.Status ?? "applied";
+        editJobInterviewDate = job.InterviewDate;
+        editJobInterviewType = job.InterviewType;
+        editJobWebsiteLink = job.WebsiteLink;
+        isAddingJob = false;
+    }
+
+    private void CancelEditJob()
+    {
+        editingJobId = null;
+        ResetEditForm();
+    }
+
+    private void ResetJobForm()
+    {
+        newJobCompany = string.Empty;
+        newJobRole = string.Empty;
+        newJobLocation = string.Empty;
+        newJobAppliedDate = DateTime.Today;
+        newJobStatus = "applied";
+        newJobInterviewDate = null;
+        newJobInterviewType = null;
+        newJobWebsiteLink = null;
+    }
+
+    private void ResetEditForm()
+    {
+        editJobCompany = string.Empty;
+        editJobRole = string.Empty;
+        editJobLocation = string.Empty;
+        editJobAppliedDate = DateTime.Today;
+        editJobStatus = "applied";
+        editJobInterviewDate = null;
+        editJobInterviewType = null;
+        editJobWebsiteLink = null;
     }
     private async Task LoadJobsAsync(Guid userId)
     {
@@ -120,9 +227,8 @@
         {
             jobs = await JobService.GetJobsByUserAsync(userId);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error loading jobs: {ex.Message}");
         }
     }
     private async Task CreateJobAsync()
@@ -130,27 +236,82 @@
         try
         {
             var user = AuthService.GetCurrentUser();
-            Console.WriteLine($"Current user: {user?.Id}");
             if (user?.Id != null)
             {
                 var newJob = new Job
                 {
                     Id = Guid.NewGuid(),
                     UserId = Guid.Parse(user.Id),
-                    Company = "New Company",
-                    Role = "New Role",
-                    Location = "New Location",
-                    AppliedDate = DateTime.UtcNow,
-                    Status = "applied",
-                    InterviewDate = null
+                    Company = newJobCompany,
+                    Role = newJobRole,
+                    Location = newJobLocation,
+                    AppliedDate = newJobAppliedDate,
+                    Status = string.IsNullOrEmpty(newJobStatus) ? "applied" : newJobStatus,
+                    InterviewDate = newJobInterviewDate,
+                    InterviewType = newJobInterviewType,
+                    WebsiteLink = newJobWebsiteLink
                 };
                 await JobService.CreateJobAsync(newJob);
                 await LoadJobsAsync(Guid.Parse(user.Id));
+                isAddingJob = false;
+                ResetJobForm();
             }
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error creating job: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteJobAsync(Guid jobId)
+    {
+        try
+        {
+            var user = AuthService.GetCurrentUser();
+            if (user?.Id != null)
+            {
+                var success = await JobService.DeleteJobAsync(jobId);
+                if (success)
+                {
+                    await LoadJobsAsync(Guid.Parse(user.Id));
+                }
+                else
+                {
+                }
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private async Task UpdateJobAsync()
+    {
+        try
+        {
+            var user = AuthService.GetCurrentUser();
+            if (user?.Id != null && editingJobId.HasValue)
+            {
+                var updatedJob = new Job
+                {
+                    Id = editingJobId.Value,
+                    UserId = Guid.Parse(user.Id),
+                    Company = editJobCompany,
+                    Role = editJobRole,
+                    Location = editJobLocation,
+                    AppliedDate = editJobAppliedDate,
+                    Status = string.IsNullOrEmpty(editJobStatus) ? "applied" : editJobStatus,
+                    InterviewDate = editJobInterviewDate,
+                    InterviewType = editJobInterviewType,
+                    WebsiteLink = editJobWebsiteLink
+                };
+                await JobService.UpdateJobAsync(updatedJob);
+                await LoadJobsAsync(Guid.Parse(user.Id));
+                editingJobId = null;
+                ResetEditForm();
+            }
+        }
+        catch
+        {
         }
     }
 }

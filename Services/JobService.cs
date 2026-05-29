@@ -26,9 +26,8 @@ namespace JobTracker.Services
 
                 return response.Models.FirstOrDefault();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error creating job: {ex.Message}");
                 return null;
             }
         }
@@ -45,9 +44,8 @@ namespace JobTracker.Services
 
                 return response.Models;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error fetching user jobs: {ex.Message}");
                 return new List<Job>();
             }
         }
@@ -64,9 +62,8 @@ namespace JobTracker.Services
 
                 return response;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error fetching job: {ex.Message}");
                 return null;
             }
         }
@@ -82,9 +79,8 @@ namespace JobTracker.Services
 
                 return response.Models;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error fetching all jobs: {ex.Message}");
                 return new List<Job>();
             }
         }
@@ -101,9 +97,8 @@ namespace JobTracker.Services
 
                 return response.Models.FirstOrDefault();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error updating job: {ex.Message}");
                 return null;
             }
         }
@@ -120,9 +115,8 @@ namespace JobTracker.Services
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error deleting job: {ex.Message}");
                 return false;
             }
         }
@@ -139,9 +133,8 @@ namespace JobTracker.Services
 
                 return response.Models;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error fetching jobs by status: {ex.Message}");
                 return new List<Job>();
             }
         }
@@ -157,9 +150,8 @@ namespace JobTracker.Services
                 job.Status = newStatus;
                 return await UpdateJobAsync(job);
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error updating job status: {ex.Message}");
                 return null;
             }
         }

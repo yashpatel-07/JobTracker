@@ -6,6 +6,10 @@ A Blazor WebAssembly application for tracking and managing job applications and 
 
 JobTracker is a web-based job application tracker designed to help users organize, monitor, and manage their job search process. Built with Blazor WebAssembly, it provides a responsive and interactive user experience.
 
+## Hosting
+
+This application is hosted on **Cloudflare Pages**. You can visit it here: [https://68854a42.jobtracker-c6e.pages.dev/](https://68854a42.jobtracker-c6e.pages.dev/)
+
 ## Features
 
 - **Dashboard**: Overview of your job tracking activity
@@ -126,11 +130,11 @@ The output will be in the `bin/Release/net10.0/publish/wwwroot` directory.
 
 ## Current Status
 
-⚠️ **Project Status**: Under Development
+✅ **Project Status**: Complete
 
-This project is still in active development. Features and functionality may change.
+The core functionality is complete and fully operational. The application is ready for use.
 
-### Upcoming Features
+### Future Enhancements
 
 - [ ] Job application statistics
 - [ ] Advanced filtering and search

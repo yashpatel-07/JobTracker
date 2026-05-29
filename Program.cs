@@ -12,7 +12,8 @@ var supabaseKey = builder.Configuration["Supabase:Key"] ?? throw new InvalidOper
 
 var options = new SupabaseOptions
 {
-    AutoConnectRealtime = true
+    AutoConnectRealtime = true,
+    AutoRefreshToken = true
 };
 
 builder.Services.AddScoped(_ => new Supabase.Client(supabaseUrl, supabaseKey, options));
