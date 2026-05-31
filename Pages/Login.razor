@@ -9,55 +9,56 @@
         <div class="page-content center">
             <div class="w-md-fixed container">
                 <div class="stack">
+                    <h5>⚠️ This is a portfolio demo. Don't use real passwords or personal info.</h5>
                     <h2>Sign In</h2>
 
                     @if (!string.IsNullOrEmpty(errorMessage))
                     {
                         <div class="field__error">
                             @errorMessage
+                        </div>
+                    }
+
+                    <div class="field">
+                        <label class="field__label" for="email">Email</label>
+                        <input class="input" id="email" type="email" placeholder="you@example.com" @bind="email" />
                     </div>
-                }
 
-                <div class="field">
-                    <label class="field__label" for="email">Email</label>
-                    <input class="input" id="email" type="email" placeholder="you@example.com" @bind="email" />
+                    <div class="field">
+                        <label class="field__label" for="password">Password</label>
+                        <input class="input" id="password" type="password" placeholder="••••••••" @bind="password" />
+                    </div>
+
+                    <button class="btn btn--primary btn--md btn--full" @onclick="SignIn" disabled="@isLoadingSignIn">
+                        @if (isLoadingSignIn)
+                        {
+                            <span>Signing in...</span>
+                        }
+                        else
+                        {
+                            <span>Sign In</span>
+                        }
+                    </button>
+
+                    <div class="row">
+                        <div class="divider--horizontal"></div>
+                        <span class="text-secondary text-sm">OR</span>
+                        <div class="divider--horizontal"></div>
+                    </div>
+
+                    <button class="btn btn--secondary btn--md btn--full" @onclick="SignUp" disabled="@isLoadingSignUp">
+                        @if (isLoadingSignUp)
+                        {
+                            <span>Signing up...</span>
+                        }
+                        else
+                        {
+                            <span>Sign Up</span>
+                        }
+                    </button>
                 </div>
-
-                <div class="field">
-                    <label class="field__label" for="password">Password</label>
-                    <input class="input" id="password" type="password" placeholder="••••••••" @bind="password" />
-                </div>
-
-                <button class="btn btn--primary btn--md btn--full" @onclick="SignIn" disabled="@isLoadingSignIn">
-                    @if (isLoadingSignIn)
-                    {
-                        <span>Signing in...</span>
-                    }
-                    else
-                    {
-                        <span>Sign In</span>
-                    }
-                </button>
-
-                <div class="row">
-                    <div class="divider--horizontal"></div>
-                    <span class="text-secondary text-sm">OR</span>
-                    <div class="divider--horizontal"></div>
-                </div>
-
-                <button class="btn btn--secondary btn--md btn--full" @onclick="SignUp" disabled="@isLoadingSignUp">
-                    @if (isLoadingSignUp)
-                    {
-                        <span>Signing up...</span>
-                    }
-                    else
-                    {
-                        <span>Sign Up</span>
-                    }
-                </button>
             </div>
         </div>
-    </div>
     </div>
 }
 
@@ -76,7 +77,7 @@
     {
         // Wait for session to be fully initialized
         await AuthService.WaitForSessionAsync();
-        
+
         // If user is already authenticated, redirect to jobs
         if (AuthService.IsAuthenticated)
         {
