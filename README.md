@@ -8,7 +8,7 @@ JobTracker is a web-based job application tracker designed to help users organiz
 
 ## Hosting
 
-This application is hosted on **Cloudflare Pages**. You can visit it here: [Link](jobtracker-c6e.pages.dev)
+This application is hosted on [**Cloudflare Pages**](https://jobtracker-c6e.pages.dev).
 
 ## Features
 
